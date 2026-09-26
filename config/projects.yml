@@ -1,0 +1,87 @@
+# The projects on the portfolio, newest first. There is no database: this file
+# is the whole list, loaded once by app/models/project.rb and checked by
+# test/models/project_test.rb.
+#
+#   slug         stable id; also the page anchor (#cyvasse)
+#   name         what the project was called
+#   year         the year it started (an integer; the list sorts on it)
+#   until        optional last active year, shown as "2015–17"
+#   description  one line, 160 characters at most
+#   stack        what it was built with, as it was built
+#   github       the original repository
+#   live         optional https link on mcritchie.studio
+#   rebuild      true when `live` is a modern rebuild, not the original app
+
+- slug: mcritchie-studio
+  name: McRitchie Studio
+  year: 2026
+  description: An app studio where a team of AI agents designs, builds, reviews and ships web apps, including the rebuilds on this page.
+  stack: Rails 8 · Solana · AI agents
+  github: https://github.com/McRitchie-Studio/mcritchie-studio
+  live: https://mcritchie.studio
+
+- slug: weekly-lock
+  name: The Weekly Lock
+  year: 2016
+  description: New NFL locks every Wednesday of the season, with social sign-in to follow along.
+  stack: Rails 5 · OmniAuth
+  github: https://github.com/amcritchie/the_weekly_lock
+  live: https://weekly-lock.mcritchie.studio
+  rebuild: true
+
+- slug: restaurant-evaluations
+  name: Restaurant Evaluation Platform
+  year: 2015
+  until: 2017
+  description: Anonymous restaurant evaluations scored against house standards, with an admin side for restaurants, departments and evaluators.
+  stack: Rails 4 · PostgreSQL
+  github: https://github.com/amcritchie/garret-app
+
+- slug: iron-ocean
+  name: Iron Ocean
+  year: 2015
+  until: 2016
+  description: A company site with products, an about page, a blog and a contact form, deployed by hand to a five-dollar droplet.
+  stack: Rails 4 · Capistrano · Nginx
+  github: https://github.com/amcritchie/iron_ocean_rb
+
+- slug: google-search-position
+  name: Google Search Position
+  year: 2015
+  description: Type a search and a web address, and it tells you where that address ranks in Google's first 64 results.
+  stack: Rails 4 · Google Search API
+  github: https://github.com/amcritchie/google-search-position
+
+- slug: property-manager
+  name: Property Manager
+  year: 2015
+  description: Keeps track of property-management clients and the properties they own.
+  stack: Rails 4 · PostgreSQL
+  github: https://github.com/amcritchie/property-manager
+
+- slug: prisoners-dilemma
+  name: Prisoner's Dilemma Tournament
+  year: 2014
+  description: Game theory as a sport. Players enter tournaments and face off, round after round, in the prisoner's dilemma.
+  stack: Rails 4 · PostgreSQL
+  github: https://github.com/amcritchie/prisoners-dilemma-tournament
+  live: https://prisoners-dilemma.mcritchie.studio
+  rebuild: true
+
+- slug: rantly
+  name: Rantly
+  year: 2014
+  description: A Twitter rival for people who need more room. Write long rants, follow ranters, favorite and comment.
+  stack: Rails 4 · PostgreSQL
+  github: https://github.com/amcritchie/rantly
+  live: https://rantly.mcritchie.studio
+  rebuild: true
+
+- slug: cyvasse
+  name: Cyvasse
+  year: 2014
+  description: My first app, a hex-board strategy game for two. Rebuilt in 2026 with its original games imported.
+  stack: Rails 4 · jQuery · Bootstrap
+  github: https://github.com/amcritchie/cyvasse
+  live: https://cyvasse.mcritchie.studio
+  rebuild: true
