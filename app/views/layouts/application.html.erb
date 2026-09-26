@@ -1,17 +1,15 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js">
   <head>
-    <title><%= content_for(:title) || "Greig McRitchie" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-    <meta name="description" content="Photos of Greig McRitchie.">
-    <meta name="theme-color" content="#000000">
-    <meta name="color-scheme" content="dark">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Greig McRitchie">
-    <meta name="application-name" content="Greig McRitchie">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta property="og:title" content="Greig McRitchie">
+    <title><%= content_for(:title) || "Alex McRitchie" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="description" content="Alex McRitchie's projects since 2014, with links to the code and to live showcase rebuilds.">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#f7f6f2" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#121316" media="(prefers-color-scheme: dark)">
+    <meta name="application-name" content="Alex McRitchie">
+    <meta property="og:title" content="Alex McRitchie — Projects">
+    <meta property="og:description" content="Web apps since 2014, with links to the code and to live showcase rebuilds.">
     <meta property="og:type" content="website">
     <%= csp_meta_tag %>
 
@@ -26,6 +24,8 @@
   </head>
 
   <body>
-    <%= yield %>
+    <div class="page">
+      <%= yield %>
+    </div>
   </body>
 </html>

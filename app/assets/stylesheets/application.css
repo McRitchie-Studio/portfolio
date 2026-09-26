@@ -1,19 +1,43 @@
 /*
- * Greig McRitchie — a full-screen photo slideshow.
+ * Alex McRitchie — Projects.
  *
- * Two render paths share one markup:
- *   html.no-js  a plain stacked gallery (no JavaScript, or a browser too old for import maps)
- *   html.js     the full-screen slideshow driven by app/javascript/slideshow.js
+ * One page: an intro, then the projects as a timeline, newest first.
+ * Plain CSS, no build step. Colors are tokens on :root, redefined for dark
+ * mode, so every rule below reads the same in both themes.
  */
 
 :root {
-  --ink: 255 255 255;
-  --stage: 0 0 0;
-  --fade: 900ms;
-  --chrome-fade: 400ms;
-  --font: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-  --ui-font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  color-scheme: dark;
+  --bg: #f7f6f2;
+  --surface: #ffffff;
+  --text: #1a1c20;
+  --muted: #5d626b;
+  --faint: #8a8f98;
+  --line: #e3e1da;
+  --accent: #1f5fa8;
+  --accent-soft: #e5eef8;
+  --badge-text: #7a4b00;
+  --badge-bg: #fbefd9;
+  --shadow: 0 1px 2px rgb(20 20 30 / 0.04), 0 4px 16px rgb(20 20 30 / 0.05);
+
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121316;
+    --surface: #1a1c21;
+    --text: #ecebe6;
+    --muted: #a3a7af;
+    --faint: #787d86;
+    --line: #2b2e35;
+    --accent: #7fb2f0;
+    --accent-soft: #1d2a3b;
+    --badge-text: #f3c77b;
+    --badge-bg: #3a2e1a;
+    --shadow: none;
+  }
 }
 
 *,
@@ -22,22 +46,37 @@
   box-sizing: border-box;
 }
 
-html,
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
-  background: rgb(var(--stage));
-  color: rgb(var(--ink));
-  font-family: var(--ui-font);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 1.0625rem;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
-img {
-  display: block;
-  max-width: 100%;
-  height: auto;
+a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
 }
 
-/* Read by screen readers, never seen: the live region that names each photo. */
+a:hover {
+  text-decoration-thickness: 2px;
+}
+
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -45,279 +84,267 @@ img {
   margin: -1px;
   padding: 0;
   overflow: hidden;
-  clip-path: inset(50%);
+  clip: rect(0 0 0 0);
   white-space: nowrap;
   border: 0;
 }
 
-/* ---------- no-js: a quiet stacked gallery ---------- */
-
-html.no-js .slideshow {
-  max-width: 64rem;
+.page {
+  max-width: 46rem;
   margin: 0 auto;
-  padding: 2rem 1rem 4rem;
+  padding: clamp(3rem, 8vw, 6rem) 1rem 3rem;
 }
 
-html.no-js .slideshow__title {
-  font-family: var(--font);
-  font-weight: 400;
-  font-size: clamp(1.75rem, 5vw, 3rem);
-  text-align: center;
-  margin: 0 0 2rem;
+/* ---------- intro ---------- */
+
+.eyebrow {
+  margin: 0 0 0.5rem;
+  color: var(--faint);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
-html.no-js .slide {
-  margin: 0 0 2rem;
+h1 {
+  margin: 0 0 1.25rem;
+  font-family: var(--serif);
+  font-size: clamp(2.5rem, 7vw, 3.75rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
 }
 
-html.no-js .slide__backdrop,
-html.no-js .slideshow__controls,
-html.no-js .slideshow__hint {
-  display: none;
+.lede {
+  margin: 0 0 1rem;
+  max-width: 38rem;
+  font-size: 1.1875rem;
 }
 
-html.no-js .slide__photo {
-  margin: 0 auto;
-  max-height: 90vh;
-  width: auto;
+.lede--quiet {
+  color: var(--muted);
+  font-size: 1.0625rem;
 }
 
-/* ---------- js: the full-screen slideshow ---------- */
-
-html.js,
-html.js body {
-  height: 100%;
-  overflow: hidden;
-  overscroll-behavior: none;
+.lede strong {
+  color: var(--text);
+  font-weight: 600;
 }
 
-html.js .slideshow {
-  position: fixed;
-  inset: 0;
-  height: 100vh;
-  height: 100dvh;
-  overflow: hidden;
-  background: rgb(var(--stage));
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-html.js .slideshow__stage {
-  position: absolute;
-  inset: 0;
-  touch-action: pan-y pinch-zoom;
-}
-
-html.js .slide {
-  position: absolute;
-  inset: 0;
-  margin: 0;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity var(--fade) ease, visibility 0s linear var(--fade);
-}
-
-html.js .slide.is-active {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity var(--fade) ease, visibility 0s linear 0s;
-}
-
-/* The same photo, blown up and blurred, fills the letterbox so a portrait
-   photo on a landscape screen (or the reverse) never sits in dead black. */
-html.js .slide__backdrop {
-  position: absolute;
-  inset: -8%;
-  width: 116%;
-  height: 116%;
-  max-width: none;
-  object-fit: cover;
-  filter: blur(40px) saturate(1.1) brightness(0.45);
-  transform: translateZ(0);
-}
-
-html.js .slide__photo {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  padding: max(env(safe-area-inset-top), 0.5rem) max(env(safe-area-inset-right), 0.5rem)
-    max(env(safe-area-inset-bottom), 0.5rem) max(env(safe-area-inset-left), 0.5rem);
-  filter: drop-shadow(0 1.5rem 3rem rgb(0 0 0 / 0.55));
-}
-
-/* A slow drift while a photo is on screen (skipped under reduced motion).
-   A transition, not an animation: when a slide leaves, the delay holds its
-   drifted scale through the fade-out and resets it only once it is hidden. */
-html.js .slide__photo {
-  transform: scale(1);
-  transition: transform 0s linear var(--fade);
-}
-
-html.js .slide.is-active .slide__photo {
-  transform: scale(1.04);
-  transition: transform 12s ease-out;
-}
-
-/* ---------- chrome: title, controls, hint ---------- */
-
-html.js .slideshow__title {
-  position: absolute;
-  z-index: 2;
-  top: max(env(safe-area-inset-top), 1.25rem);
-  left: max(env(safe-area-inset-left), 1.5rem);
-  margin: 0;
-  font-family: var(--font);
-  font-weight: 400;
-  font-size: clamp(1.1rem, 2.6vw, 1.75rem);
+.summary {
+  margin: 1.75rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: 0.8125rem;
   letter-spacing: 0.02em;
-  text-shadow: 0 1px 12px rgb(0 0 0 / 0.7);
-  pointer-events: none;
 }
 
-.slideshow__controls {
-  position: absolute;
-  z-index: 2;
-  left: 50%;
-  bottom: max(env(safe-area-inset-bottom), 1.25rem);
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.35rem;
-  border-radius: 999px;
-  background: rgb(0 0 0 / 0.45);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 0 0 1px rgb(var(--ink) / 0.12);
-}
+/* ---------- timeline ---------- */
 
-.control {
-  display: grid;
-  place-items: center;
-  width: 2.75rem;
-  height: 2.75rem;
+.timeline {
+  position: relative;
+  margin: 2.5rem 0 0;
   padding: 0;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: rgb(var(--ink));
-  cursor: pointer;
-  transition: background-color 150ms ease;
+  list-style: none;
 }
 
-.control[hidden] {
-  display: none;
-}
-
-.control:hover {
-  background: rgb(var(--ink) / 0.14);
-}
-
-.control:focus-visible {
-  outline: 2px solid rgb(var(--ink));
-  outline-offset: 2px;
-}
-
-.control svg {
-  width: 1.4rem;
-  height: 1.4rem;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.control svg .fill {
-  fill: currentColor;
-  stroke: none;
-}
-
-.control[aria-pressed="true"] .icon-play,
-.control[aria-pressed="false"] .icon-pause,
-.control[aria-pressed="true"] .icon-expand,
-.control[aria-pressed="false"] .icon-collapse {
-  display: none;
-}
-
-.slideshow__counter {
-  min-width: 4.5ch;
-  padding: 0 0.35rem;
-  font-size: 0.9rem;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  text-align: center;
-  color: rgb(var(--ink) / 0.85);
-}
-
-html.js .slideshow__hint {
+/* The rail the year markers sit on. */
+.timeline::before {
+  content: "";
   position: absolute;
-  z-index: 2;
-  left: 0;
-  right: 0;
-  bottom: calc(max(env(safe-area-inset-bottom), 1.25rem) + 4.25rem);
+  top: 0.75rem;
+  bottom: 0.75rem;
+  left: 4.25rem;
+  width: 1px;
+  background: var(--line);
+}
+
+.timeline > li + li {
+  margin-top: 1.25rem;
+}
+
+.project {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  column-gap: 1.5rem;
+  scroll-margin-top: 1.5rem;
+}
+
+.project__years {
+  position: relative;
+  padding-top: 1.35rem;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* The dot on the rail. */
+.project__years::after {
+  content: "";
+  position: absolute;
+  top: 1.75rem;
+  right: -1.15rem;
+  width: 9px;
+  height: 9px;
+  border: 2px solid var(--bg);
+  border-radius: 50%;
+  background: var(--faint);
+  box-sizing: content-box;
+}
+
+.project:target .project__years::after,
+.project:has(.badge) .project__years::after {
+  background: var(--accent);
+}
+
+.project__body {
+  min-width: 0;
+  padding: 1.1rem 1.25rem 1.2rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.project:target .project__body {
+  border-color: var(--accent);
+}
+
+.project__name {
+  display: inline;
   margin: 0;
-  text-align: center;
-  font-size: 0.85rem;
-  color: rgb(var(--ink) / 0.7);
-  text-shadow: 0 1px 8px rgb(0 0 0 / 0.8);
-  pointer-events: none;
-  transition: opacity 1.2s ease;
+  font-family: var(--serif);
+  font-size: 1.375rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
 }
 
-html.js .slideshow__hint.is-gone {
-  opacity: 0;
+.project__name a {
+  color: inherit;
+  text-decoration: none;
 }
 
-/* The chrome fades away while nobody is touching anything, and comes back
-   on any movement, tap, or keyboard focus. */
-html.js .slideshow__title,
-.slideshow__controls {
-  transition: opacity var(--chrome-fade) ease;
+.project__name a:hover {
+  text-decoration: underline;
 }
 
-html.js .slideshow.is-idle .slideshow__title,
-html.js .slideshow.is-idle .slideshow__controls {
-  opacity: 0;
+.badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  background: var(--badge-bg);
+  color: var(--badge-text);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.5;
+  vertical-align: 0.25em;
+  white-space: nowrap;
 }
 
-/* Hidden controls take no taps: a finger on the invisible bar lands on the
-   stage, which wakes the chrome instead of pressing a button unseen. A click
-   or tap leaves focus on the button, so this must not key off :focus-within;
-   keyboard focus never meets is-idle, because the script wakes on focusin and
-   will not sleep while a control is :focus-visible. */
-html.js .slideshow.is-idle .slideshow__controls {
-  pointer-events: none;
+.project__description {
+  margin: 0.45rem 0 0;
 }
 
-html.js .slideshow.is-idle {
-  cursor: none;
+.project__stack {
+  margin: 0.5rem 0 0;
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: 0.75rem;
 }
 
-/* Belt and braces: a keyboard-focused control is never hidden. */
-html.js .slideshow.is-idle .slideshow__controls:has(:focus-visible) {
-  opacity: 1;
-  pointer-events: auto;
+.project__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9375rem;
 }
 
-/* ---------- reduced motion: cut, don't fade or drift ---------- */
+.project__links li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 0.4rem;
+  min-width: 0;
+}
 
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    --fade: 0ms;
-    --chrome-fade: 0ms;
+.link {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.link--live {
+  padding: 0.1rem 0.55rem;
+  border-radius: 6px;
+  background: var(--accent-soft);
+}
+
+.link__host {
+  color: var(--faint);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  overflow-wrap: anywhere;
+}
+
+.arrow {
+  display: inline-block;
+  font-size: 0.85em;
+}
+
+/* ---------- footer ---------- */
+
+.footer {
+  margin-top: 3.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+.footer p {
+  margin: 0;
+}
+
+/* ---------- phones ---------- */
+
+@media (max-width: 34rem) {
+  .timeline::before {
+    display: none;
   }
 
-  html.js .slide__photo,
-  html.js .slide.is-active .slide__photo {
-    transform: none;
-    transition: none;
+  .project {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  html.js .slideshow__hint {
-    transition: none;
+  .project__years {
+    padding: 0 0 0.35rem;
+    text-align: left;
+  }
+
+  .project__years::after {
+    display: none;
+  }
+
+  .project__body {
+    padding: 1rem;
+  }
+}
+
+@media print {
+  .project__body {
+    box-shadow: none;
   }
 }

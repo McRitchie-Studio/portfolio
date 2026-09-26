@@ -5,7 +5,7 @@
 require "json"
 
 results = [ %w[http /], %w[http /up], %w[https /], %w[https /up] ].to_h do |proto, path|
-  env = Rack::MockRequest.env_for("http://greigmcritchie.com#{path}",
+  env = Rack::MockRequest.env_for("http://portfolio.mcritchie.studio#{path}",
     "HTTP_X_FORWARDED_PROTO" => proto, "REMOTE_ADDR" => "10.1.2.3")
   status, headers, body = Rails.application.call(env)
   body.close if body.respond_to?(:close)
