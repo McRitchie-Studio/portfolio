@@ -1,73 +1,65 @@
-# dads-app
+# portfolio
 
-Greig McRitchie's photo slideshow — greigmcritchie.com
+Alex McRitchie's portfolio: portfolio.mcritchie.studio
 
-A single full-screen slideshow of the ten photos from the 2015 Christmas gift
-([amcritchie/grieg_mcritchie](https://github.com/amcritchie/grieg_mcritchie)).
-It is a Rails 8.1 app with **no database** and no studio-engine, so it runs on
-one Heroku Eco dyno for about $5 a month.
+One page listing the web apps Alex has built since 2014, each with its year, a
+one-line description, a link to the original code on GitHub and, where one
+exists, a link to its live build on `mcritchie.studio`. Several of the old apps
+are back as **showcase rebuilds** made through the McRitchie Studio App
+Builder; the page marks them as such.
+
+A rebuild of the 2017–23 portfolio site,
+[amcritchie/portfolio](https://github.com/amcritchie/portfolio) (Rails 5,
+alexmcritchie.com). Nothing was ported: the old repo supplied the voice and
+the project list, checked against each project's own GitHub repository.
+
+It is a Rails 8.1 app with **no database**, no accounts and no studio-engine,
+built from the [dads-app](https://github.com/McRitchie-Studio/dads-app) shape,
+so it runs on one Heroku Eco dyno.
 
 ## How it works
 
 | Piece | Where |
 |-------|-------|
-| The photo list (number, size, alt text) | `app/models/photo.rb` — a plain `Data` class; there is no database |
-| The photos (compressed, metadata stripped) | `app/assets/images/photos/greig1..10.jpg`, plus smaller `greigN-640w.jpg` / `greigN-1200w.jpg` copies of the wide ones |
-| The page | `app/views/slideshow/index.html.erb` at `/` |
-| The behavior | `app/javascript/slideshow.js` (plain ES module through importmap) |
-| The look | `app/assets/stylesheets/application.css` (plain CSS) |
+| The project list | `config/projects.yml`, newest first; the file documents its fields |
+| Reading it | `app/models/project.rb`, a plain `Data` class loaded once and frozen; a malformed file raises at boot |
+| The page | `app/views/projects/index.html.erb` at `/` |
+| The look | `app/assets/stylesheets/application.css`, plain CSS with light and dark tokens |
 | Health check | `/up` |
 
-- **Keyboard:** Left/Right (or Page Up/Down) step, Home/End jump, Space or K
-  plays and pauses, F toggles full screen.
-- **Touch:** swipe left or right; a tap brings the controls back.
-- **Full screen:** a button where the browser supports it. iPhone Safari cannot
-  put a page full screen, so the button hides there; the page already fills the
-  screen edge to edge, and "Add to Home Screen" opens it without browser chrome.
-- **Reduced motion:** no autoplay, and photos cut instead of fading or drifting.
-- **Screen readers:** a visually hidden live region says "Photo 2 of 10: ..."
-  with the alt text on each change while the viewer is driving; it goes quiet
-  during autoplay.
-- **Idle chrome:** the controls fade after three seconds without input, also
-  after a mouse click or a tap leaves focus on a button. Only keyboard focus
-  (`:focus-visible`) keeps them up.
-- **Phones:** wide photos list their smaller copies in `srcset` (`sizes="100vw"`),
-  so a phone downloads a 640 or 1200 px copy instead of the 2400 px original.
-- **No cookies:** the session store is disabled and there is no CSRF meta tag;
-  the page is public and has no forms.
-- **No JavaScript, or a browser too old for import maps:** the same page reads
-  as a plain stacked gallery.
+- **No JavaScript needed.** Every link works without it; `application.js`
+  only swaps `no-js` for `js` on `<html>`.
+- **No cookies.** The session store is disabled; the page has no forms.
+- **Deep links.** Each project is an anchor: `/#cyvasse`. The targeted card
+  is outlined.
+- **Phones.** Below 34rem the timeline rail folds away and the year sits
+  above each card.
 
-To add or swap a photo: put the JPEG in `app/assets/images/photos/`, keep it
-under 512 KB and no wider than 2400 px, and add its row (with real alt text and
-its pixel size) to `Photo::ALL`. If it is wider than 640 px, also add a copy at
-each narrower `Photo::VARIANT_WIDTHS` entry:
-
-```bash
-magick greigN.jpg -resize 640x -strip -quality 80 -interlace JPEG greigN-640w.jpg
-```
-
-`PhotoTest` checks every size, and every copy, against the files.
+To add a project, add a row to `config/projects.yml` in year order. A
+`live` link must be `https` on `mcritchie.studio`; set `rebuild: true` when it
+is a modern rebuild rather than the original. `ProjectTest` checks every row,
+and fails on anything that looks like an email address or phone number.
 
 ## Develop
 
 ```bash
 bundle install
-bin/rails server -p 3701     # dads-app uses ports 3700-3799
-bin/rails test               # unit + component
-bin/rails test:system        # the slideshow in headless Chrome
+bin/rails server -p 3810
+bin/rails test               # unit + component + production https probe
+bin/rails test:system        # the page in headless Chrome, desktop and a 375 px phone
 bin/ci                       # everything CI runs
 ```
 
 ## Deploy
 
-Heroku app `dads-app`, `heroku/ruby` buildpack, no add-ons, one `web` process
-(`Procfile`, no release phase since there is nothing to migrate). There is no
-`config/credentials.yml.enc`; production reads `SECRET_KEY_BASE` from the
-environment, which the Ruby buildpack sets on the first deploy (check with
-`heroku config:get SECRET_KEY_BASE -a dads-app`). Production forces HTTPS: the
-Heroku router reports the visitor's scheme in `X-Forwarded-Proto`, so
-`assume_ssl` stays off and plain `http://` gets a 301, except `/up`, which
-answers on either scheme (`ProductionSslTest` boots production to prove it).
-CI runs on every pull request
-and on pushes to `accepted`, `release` and `main`.
+Heroku app `mcr-portfolio` (company account, stack heroku-26), `heroku/ruby`
+buildpack, no add-ons, one Eco `web` dyno (`Procfile`, no release phase since
+there is nothing to migrate). There is no `config/credentials.yml.enc`;
+production reads `SECRET_KEY_BASE` from the environment. Production forces
+HTTPS: the Heroku router reports the visitor's scheme in `X-Forwarded-Proto`,
+so plain `http://` gets a 301, except `/up`, which answers on either scheme
+(`ProductionSslTest` boots production to prove it).
+
+Branches: feature PRs target `accepted`, which is promoted to `release` and
+then `main`. CI runs on every pull request and on pushes to `accepted`,
+`release` and `main`.
