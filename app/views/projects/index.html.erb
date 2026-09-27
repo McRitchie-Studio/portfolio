@@ -1,0 +1,66 @@
+<% content_for :title, "Alex McRitchie — Projects" %>
+
+<header class="intro">
+  <p class="eyebrow">Portfolio</p>
+  <h1>Alex McRitchie</h1>
+  <p class="lede">
+    I build web apps. These are the ones I have made since 2014: the early ones
+    in Rails, jQuery and AngularJS, the newest with a team of AI agents at
+    McRitchie Studio.
+  </p>
+  <p class="lede lede--quiet">
+    Several of the old ones are back as <strong>showcase rebuilds</strong>:
+    small modern versions of the original idea, built through the
+    <a href="https://mcritchie.studio/build">McRitchie Studio App Builder</a>.
+    The original code is on GitHub, as it was.
+  </p>
+  <p class="summary">
+    <%= pluralize(@projects.size, "project") %>
+    · <%= @projects.map(&:year).min %>–<%= @projects.map(&:year).max %>
+  </p>
+</header>
+
+<main>
+  <h2 class="visually-hidden">Projects</h2>
+  <ol class="timeline" reversed>
+    <% @projects.each do |project| %>
+      <li>
+        <article class="project" id="<%= project.slug %>">
+          <time class="project__years" datetime="<%= project.year %>"><%= project.years %></time>
+          <div class="project__body">
+            <h3 class="project__name">
+              <a href="#<%= project.slug %>"><%= project.name %></a>
+            </h3>
+            <% if project.rebuild? %>
+              <span class="badge">Showcase rebuild</span>
+            <% end %>
+            <p class="project__description"><%= project.description %></p>
+            <% if project.stack %>
+              <p class="project__stack"><%= project.stack %></p>
+            <% end %>
+            <ul class="project__links">
+              <% if project.live? %>
+                <li>
+                  <%= external_link(project.rebuild? ? "Live showcase" : "Live site", project.live, class: "link link--live") %>
+                  <span class="link__host"><%= project.live_host %></span>
+                </li>
+              <% end %>
+              <li>
+                <%= external_link("GitHub", project.github, class: "link") %>
+                <span class="link__host"><%= project.github_path %></span>
+              </li>
+            </ul>
+          </div>
+        </article>
+      </li>
+    <% end %>
+  </ol>
+</main>
+
+<footer class="footer">
+  <p>
+    A rebuild of my 2017–23 portfolio site,
+    <%= external_link("amcritchie/portfolio", "https://github.com/amcritchie/portfolio") %>.
+    Built in 2026 with <%= external_link("McRitchie Studio", "https://mcritchie.studio") %>.
+  </p>
+</footer>
